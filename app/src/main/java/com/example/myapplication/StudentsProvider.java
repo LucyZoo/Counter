@@ -31,12 +31,14 @@ public class StudentsProvider extends ContentProvider {
 
     static final int STUDENTS = 1;
     static final int STUDENT_ID = 2;
+    static final int STUDENT_NAME = 3;
 
     static final UriMatcher uriMatcher;
     static{
         uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
         uriMatcher.addURI(PROVIDER_NAME, "students", STUDENTS);
         uriMatcher.addURI(PROVIDER_NAME, "students/#", STUDENT_ID);
+        uriMatcher.addURI(PROVIDER_NAME, "students/name", STUDENT_NAME);
     }
 
     /**
@@ -144,6 +146,9 @@ public class StudentsProvider extends ContentProvider {
 
     @Override
     public int delete(Uri uri, String selection, String[] selectionArgs) {
+        System.out.println(uri);
+        System.out.println(selection);
+        System.out.println(selectionArgs.length);
         int count = 0;
         switch (uriMatcher.match(uri)){
             case STUDENTS:
@@ -154,6 +159,11 @@ public class StudentsProvider extends ContentProvider {
                 String id = uri.getPathSegments().get(1);
                 count = db.delete( STUDENTS_TABLE_NAME, _ID +  " = " + id +
                                 (!TextUtils.isEmpty(selection) ? " AND (" + selection + ')' : ""), selectionArgs);
+                break;
+            case STUDENT_NAME:
+                //id = uri.getPathSegments().get(1);
+                count = db.delete( STUDENTS_TABLE_NAME, NAME +  " = ?" +
+                        (!TextUtils.isEmpty(selection) ? " AND (" + selection + ')' : ""), selectionArgs);
                 break;
             default:
                 throw new IllegalArgumentException("Unknown URI " + uri);

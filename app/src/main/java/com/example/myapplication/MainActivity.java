@@ -1,5 +1,6 @@
 package com.example.myapplication;
 
+import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Activity;
@@ -22,6 +23,7 @@ import static com.example.myapplication.StudentsProvider.STUDENTS_TABLE_NAME;
 
 public class MainActivity extends Activity {
     Button addStudentButton;
+    Button deleteStudentButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +51,23 @@ public class MainActivity extends Activity {
                         uri.toString(), Toast.LENGTH_LONG).show();
             }
         });
+
+        deleteStudentButton = findViewById(R.id.button3);
+
+        deleteStudentButton.setOnClickListener(new View.OnClickListener()
+        {
+            public void onClick(View view){
+                CharSequence text = "Deleted student ";
+                String studentName = ((EditText)findViewById(R.id.editText2)).getText().toString();
+                Context context = getApplicationContext();
+                Uri nameUri = Uri.parse(StudentsProvider.URL + "/name");
+                String[] whereArgs = new String[] {studentName};
+                getContentResolver().delete(nameUri,null, whereArgs);
+                Toast.makeText(context, text+studentName,Toast.LENGTH_LONG).show();
+            }
+        });
+
+
     }
 
     public void onClickRetrieveStudents(View view) {
@@ -68,13 +87,5 @@ public class MainActivity extends Activity {
             } while (c.moveToNext());
         }
     }
-    public void onClickDeleteStudent(View view){
-        String URL = "content://com.example.myapplication.StudentsProvider";
 
-        Uri students = Uri.parse(URL);
-
-        StudentsProvider student = new StudentsProvider();
-        String[] whereArgs = new String[] { ((EditText)findViewById(R.id.editText2)).getText().toString()};
-        student.delete(students,StudentsProvider.NAME,whereArgs);
-    }
 }
