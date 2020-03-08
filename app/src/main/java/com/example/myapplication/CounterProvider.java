@@ -18,13 +18,13 @@ import java.util.HashMap;
 
 public class CounterProvider extends ContentProvider {
     static final String PROVIDER_NAME = "com.example.myapplication.CounterProvider";
-    static final String URL = "content://" + PROVIDER_NAME + "/";
+    static final String URL = "content://" + PROVIDER_NAME;
     static final Uri CONTENT_URI = Uri.parse(PROVIDER_NAME);
 
     static final String _ID = "_id";
     static final String NAME = "name";
     static final String FUNDS = "FundsAvailable";
-
+    static final String CATEGORY = "Category";
 
 
     static final int USER_ID = 1;
@@ -51,7 +51,7 @@ public class CounterProvider extends ContentProvider {
     static final String USER_TABLE_NAME = "Users";
     static final String FUNDS_TABLE_NAME = "Funds";
 
-    static final int DATABASE_VERSION = 1;
+    static final int DATABASE_VERSION = 2;
     static final String CREATE_USER_TABLE =
             " CREATE TABLE " + USER_TABLE_NAME +
                     " (_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
@@ -59,11 +59,12 @@ public class CounterProvider extends ContentProvider {
 
     static final String CREATE_FUNDS_TABLE =
             " CREATE TABLE " + FUNDS_TABLE_NAME +
-                    " (_id INTEGER PRIMARY KEY, " +
-                    " Category TEXT NOT NULL, " +
-                    " FundsAvailable NUM NOT NULL," +
-                    " LastOpenedDate TEXT NOT NULL," +
-                    " FOREIGN KEY (_id) REFERENCES " + USER_TABLE_NAME + "(_id));";
+                    " (_id INTEGER , " +
+                    " Category TEXT PRIMARY KEY, " +
+                    " FundsAvailable NUM ," +
+                    " LastOpenedDate TEXT );";
+//                    +
+//                    " FOREIGN KEY (_id) REFERENCES " + USER_TABLE_NAME + "(_id));";
 
     /**
      * Helper class that actually creates and manages
@@ -119,7 +120,7 @@ public class CounterProvider extends ContentProvider {
                  * If record is added successfully
                  */
                 if (rowID > 0) {
-                    Uri _uri = ContentUris.withAppendedId(CONTENT_URI, rowID);
+                    Uri _uri = ContentUris.withAppendedId(uri, rowID);
                     getContext().getContentResolver().notifyChange(_uri, null);
                     return _uri;
                 }
@@ -132,7 +133,7 @@ public class CounterProvider extends ContentProvider {
                  * If record is added successfully
                  */
                 if (insertResult > 0) {
-                    Uri _uri = ContentUris.withAppendedId(CONTENT_URI, insertResult);
+                    Uri _uri = ContentUris.withAppendedId(uri, insertResult);
                     getContext().getContentResolver().notifyChange(_uri, null);
                     return _uri;
                 }
@@ -141,9 +142,9 @@ public class CounterProvider extends ContentProvider {
             case ADD_CATEGORY:
                 long categoryAdd = db.insert(FUNDS_TABLE_NAME, "", values);
                 if (categoryAdd > 0){
-                    Uri _uriCat = ContentUris.withAppendedId(CONTENT_URI, categoryAdd);
-                    getContext().getContentResolver().notifyChange(_uriCat, null);
-                    return _uriCat;
+                    Uri _uriCat = ContentUris.withAppendedId(uri, categoryAdd);
+                    getContext().getContentResolver().notifyChange(uri, null);
+                    return uri;
                 }
                 throw new SQLException("Failed to add a record into " + uri);
 
@@ -164,7 +165,7 @@ public class CounterProvider extends ContentProvider {
                 break;
 
             case CATEGORY_COUNTER:
-                qb.appendWhere( _ID + "=" + uri.getPathSegments().get(1));
+                //qb.appendWhere( selection + "=" + uri.getPathSegments().get(1));
                 break;
 
             default:

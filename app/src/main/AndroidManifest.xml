@@ -19,9 +19,7 @@
             android:authorities="com.example.myapplication.StudentsProvider"/>
         <provider
             android:name = "CounterProvider"
-            android:authorities = "com.example.myapplication.CounterProvider"
-        >
-        </provider>
+            android:authorities = "com.example.myapplication.CounterProvider"/>
     </application>
 
 </manifest>

@@ -21,10 +21,8 @@ public class MainCounterActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
-        SignIn getUserSignIn = new SignIn();
-        signInSuccess = getUserSignIn.UserSignIn(); // deal with sign in status
-
+        //SignIn getUserSignIn = new SignIn();
+        //signInSuccess = getUserSignIn.UserSignIn(); // deal with sign in status
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.counter_main);
@@ -35,9 +33,16 @@ public class MainCounterActivity extends Activity {
             @Override
             public void onClick(View view) {
                 String[] fundsProjection = new String[] {CounterProvider.FUNDS};
-                String[] selectionArgs = new String[] {"MainCategory"};
+                String[] selectionArgs = new String[] {"TESTTABLE"};
                 // Add a new student record
-                Cursor c = getContentResolver().query(CounterProvider.CONTENT_URI, fundsProjection, CounterProvider._ID, selectionArgs, null);
+                Uri uriTest = Uri.parse(CounterProvider.URL + "/" + "TESTTABLE/" +"fetch");
+                Cursor c = getContentResolver().query(uriTest, new String[]{"FundsAvailable"}, null, null, null);
+
+                if (c.moveToFirst())
+                    System.out.println(c.getString(c.getColumnIndex("FundsAvailable"))); // test funds values
+
+                c.close();
+
 
             }
         });
@@ -47,9 +52,9 @@ public class MainCounterActivity extends Activity {
             public void onClick(View view) {
                 ContentValues values = new ContentValues();
                 String categoryInputValue = ((EditText)findViewById(R.id.addNewCategoryInput)).getText().toString();
-                values.put(CounterProvider.FUNDS, categoryInputValue);
+                values.put(CounterProvider.CATEGORY, categoryInputValue);
 
-                Uri CONTENT_URI = Uri.parse(CounterProvider.URL + categoryInputValue );
+                Uri CONTENT_URI = Uri.parse(CounterProvider.URL + "/" +categoryInputValue );
 
                 Uri uri  = getContentResolver().insert(CONTENT_URI, values);
 
