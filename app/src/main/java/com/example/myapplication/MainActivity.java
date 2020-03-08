@@ -73,9 +73,8 @@ public class MainActivity extends Activity {
     public void onClickRetrieveStudents(View view) {
         // Retrieve student records
         String URL = "content://com.example.myapplication.StudentsProvider";
-
         Uri students = Uri.parse(URL);
-        Cursor c = managedQuery(students, null, null, null, "name");
+        Cursor c = getContentResolver().query(students, null, null, null, "name");
 
         if (c.moveToFirst()) {
             do{

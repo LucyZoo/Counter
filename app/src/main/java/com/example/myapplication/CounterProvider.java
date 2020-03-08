@@ -18,22 +18,28 @@ import java.util.HashMap;
 
 public class CounterProvider extends ContentProvider {
     static final String PROVIDER_NAME = "com.example.myapplication.CounterProvider";
+    static final String URL = "content://" + PROVIDER_NAME + "/";
     static final Uri CONTENT_URI = Uri.parse(PROVIDER_NAME);
 
     static final String _ID = "_id";
     static final String NAME = "name";
+    static final String FUNDS = "FundsAvailable";
+
 
 
     static final int USER_ID = 1;
     static final int CATEGORY_COUNTER = 2;
+    static final int ADD_CATEGORY = 3;
+
 
     private static HashMap<String, String> STUDENTS_PROJECTION_MAP;
 
     static final UriMatcher uriMatcher;
     static{
         uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
-        uriMatcher.addURI(PROVIDER_NAME, "user/#", USER_ID);
-        uriMatcher.addURI(PROVIDER_NAME, "user/#/*", CATEGORY_COUNTER);
+        uriMatcher.addURI(PROVIDER_NAME, "#", USER_ID);
+        uriMatcher.addURI(PROVIDER_NAME, "*/*", CATEGORY_COUNTER);
+        uriMatcher.addURI(PROVIDER_NAME, "*", ADD_CATEGORY);
     }
 
     /**
@@ -131,6 +137,16 @@ public class CounterProvider extends ContentProvider {
                     return _uri;
                 }
                 throw new SQLException("Failed to add a record into " + uri);
+
+            case ADD_CATEGORY:
+                long categoryAdd = db.insert(FUNDS_TABLE_NAME, "", values);
+                if (categoryAdd > 0){
+                    Uri _uriCat = ContentUris.withAppendedId(CONTENT_URI, categoryAdd);
+                    getContext().getContentResolver().notifyChange(_uriCat, null);
+                    return _uriCat;
+                }
+                throw new SQLException("Failed to add a record into " + uri);
+
             default:
         }
         throw new SQLException("Failed to add a record into " + uri);
