@@ -30,6 +30,7 @@ public class CounterProvider extends ContentProvider {
     static final int USER_ID = 1;
     static final int CATEGORY_COUNTER = 2;
     static final int ADD_CATEGORY = 3;
+    static final int NEW_FUNDS_VALUE = 4;
 
 
     private static HashMap<String, String> STUDENTS_PROJECTION_MAP;
@@ -38,8 +39,9 @@ public class CounterProvider extends ContentProvider {
     static{
         uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
         uriMatcher.addURI(PROVIDER_NAME, "#", USER_ID);
-        uriMatcher.addURI(PROVIDER_NAME, "*/*", CATEGORY_COUNTER);
+        uriMatcher.addURI(PROVIDER_NAME, "*/funds", CATEGORY_COUNTER);
         uriMatcher.addURI(PROVIDER_NAME, "*", ADD_CATEGORY);
+        uriMatcher.addURI(PROVIDER_NAME, "*/#", NEW_FUNDS_VALUE);
     }
 
     /**
@@ -49,7 +51,7 @@ public class CounterProvider extends ContentProvider {
     private SQLiteDatabase db;
     static final String DATABASE_NAME = "FundsAvailable";
     static final String USER_TABLE_NAME = "Users";
-    static final String FUNDS_TABLE_NAME = "Funds";
+    static final String FUNDS_TABLE_NAME = "Categories";
 
     static final int DATABASE_VERSION = 2;
     static final String CREATE_USER_TABLE =
@@ -126,18 +128,18 @@ public class CounterProvider extends ContentProvider {
                 }
                 throw new SQLException("Failed to add a record into " + uri);
 
-            case CATEGORY_COUNTER:
-                long insertResult = db.insert(FUNDS_TABLE_NAME, "", values);
-
-                /**
-                 * If record is added successfully
-                 */
-                if (insertResult > 0) {
-                    Uri _uri = ContentUris.withAppendedId(uri, insertResult);
-                    getContext().getContentResolver().notifyChange(_uri, null);
-                    return _uri;
-                }
-                throw new SQLException("Failed to add a record into " + uri);
+//            case CATEGORY_COUNTER:
+//                long insertResult = db.insert(FUNDS_TABLE_NAME, "", values);
+//
+//                /**
+//                 * If record is added successfully
+//                 */
+//                if (insertResult > 0) {
+//                    Uri _uri = ContentUris.withAppendedId(uri, insertResult);
+//                    getContext().getContentResolver().notifyChange(_uri, null);
+//                    return _uri;
+//                }
+//                throw new SQLException("Failed to add a record into " + uri);
 
             case ADD_CATEGORY:
                 long categoryAdd = db.insert(FUNDS_TABLE_NAME, "", values);
@@ -198,11 +200,14 @@ public class CounterProvider extends ContentProvider {
     public int update(Uri uri, ContentValues values,
                       String selection, String[] selectionArgs) {
         int count = 0;
+        switch (uriMatcher.match(uri)){
+            case NEW_FUNDS_VALUE :
+                count = db.update(FUNDS_TABLE_NAME, values,
+                        NAME + " = " + uri.getPathSegments().get(1) +
+                                (!TextUtils.isEmpty(selection) ? " AND (" +selection + ')' : ""), selectionArgs);
+            case ADD_CATEGORY:
 
-        count = db.update(FUNDS_TABLE_NAME, values,
-                _ID + " = " + uri.getPathSegments().get(1) +
-                        (!TextUtils.isEmpty(selection) ? " AND (" +selection + ')' : ""), selectionArgs);
-
+        }
 
         getContext().getContentResolver().notifyChange(uri, null);
         return count;
